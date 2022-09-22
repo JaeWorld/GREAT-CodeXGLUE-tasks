@@ -206,7 +206,23 @@ def load_model(args):
     # Load custom model
     if args.load_model_path is not None:
         logger.info("reload model from {}".format(args.load_model_path))
-        model.load_state_dict(torch.load(args.load_model_path), strict=False)
+        model_state_dict = torch.load(args.load_model_path)
+        adapted_state_dict = model_state_dict
+        
+        # modifying state_dict dict
+        if model_latest_ft == 'CD':
+            adapted_state_dict = model_state_dict
+        if model_latest_ft == 'DD':
+            adapted_state_dict = {k.replace('encoder.roberta.', 'encoder.', 1): v for k, v in model_state_dict.items()}
+        if model_latest_ft == 'CR':
+            adapted_state_dict = {k: v for k, v in model_state_dict.items() if 'decoder' not in k}
+            
+        model.load_state_dict(adapted_state_dict, strict=False)
+        
+        model_latest_ft = args.load_model_path[-6:-4]
+        adapted_state_dict = model_state_dict
+            
+        
         logger.info("Successfully loaded custom model!")
 
     return config, model, tokenizer
