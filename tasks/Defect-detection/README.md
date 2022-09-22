@@ -16,8 +16,8 @@ python run.py \
     --learning_rate 2e-5 \
     --max_grad_norm 1.0 \
     --evaluate_during_training \
-    --load_custom_model \
-    --model_name model_CD.bin \
+    --load_custom_model \  # This option is necessary if you want to load pretrained model
+    --model_name model_CD.bin \   # Modify this option to the name of the model you want to load
     --output_model_name model_CD_DD.bin \
     --seed 123456  2>&1 | tee train_CD_DD.log
 ```
