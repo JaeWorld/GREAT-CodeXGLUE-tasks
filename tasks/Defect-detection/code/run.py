@@ -556,7 +556,7 @@ def main():
             if model_latest_ft == 'CS':
                adapted_state_dict = model_state_dict
             if model_latest_ft == 'CD':
-               adapted_state_dict = {k.replace('encoder.roberta.', 'encoder.', 1): v for k, v in model_state_dict.items()}
+               adapted_state_dict = {k.replace('encoder.', 'encoder.roberta.', 1): v for k, v in model_state_dict.items()}
             if model_latest_ft == 'CT' or model_latest_ft == 'CR:
                 adapted_state_dict = {k: v for k, v in model_state_dict.items() if 'decoder' not in k}
             
