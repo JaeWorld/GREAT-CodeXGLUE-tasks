@@ -27,7 +27,7 @@ python run.py \
 
 ### K-fold cross validation (k = 10)
 ```
-python3 run_kfold.py \
+python run_kfold.py \
     --output_dir=./saved_models \
     --model_type=roberta \
     --config_name=microsoft/codebert-base \
