@@ -596,9 +596,16 @@ def main():
         if os.path.exists(model_dir):
             model_state_dict = torch.load(model_dir+'/'+args.model_name)
 
+            model_latest_ft = args.model_name[-6:-4]
+            adapted_state_dict = model_state_dict
+            
             # modifying state_dict dict
-            # adapted_state_dict = model_state_dict
-            adapted_state_dict = {k.replace('encoder.roberta.', 'encoder.', 1): v for k, v in model_state_dict.items()}
+            if model_latest_ft == 'CS':
+               adapted_state_dict = model_state_dict
+            if model_latest_ft == 'DD':
+               adapted_state_dict = {k.replace('encoder.roberta.', 'encoder.', 1): v for k, v in model_state_dict.items()}
+            if model_latest_ft == 'CT' or model_latest_ft == 'CR:
+                adapted_state_dict = {k: v for k, v in model_state_dict.items() if 'decoder' not in k}
             
             config = config_class.from_pretrained(args.config_name if args.config_name else args.model_name_or_path,
                                             cache_dir=args.cache_dir if args.cache_dir else None)
