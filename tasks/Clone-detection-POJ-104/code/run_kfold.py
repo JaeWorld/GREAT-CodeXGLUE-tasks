@@ -167,7 +167,7 @@ def load_model():
                adapted_state_dict = model_state_dict
             if model_latest_ft == 'DD':
                adapted_state_dict = {k.replace('encoder.roberta.', 'encoder.', 1): v for k, v in model_state_dict.items()}
-            if model_latest_ft == 'CT' or model_latest_ft == 'CR:
+            if model_latest_ft == 'CT' or model_latest_ft == 'CR':
                 adapted_state_dict = {k: v for k, v in model_state_dict.items() if 'decoder' not in k}
 
             config = config_class.from_pretrained(args.config_name if args.config_name else args.model_name_or_path,
