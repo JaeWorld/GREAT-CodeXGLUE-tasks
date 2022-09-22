@@ -18,7 +18,7 @@ python run.py \
 	--learning_rate 5e-5 \
 	--train_steps 30000 \
 	--eval_steps 5000 \
-            --load_model_path ../../../models/model_CD.bin \
+            --load_model_path ../../../models/model_CD.bin \  # Modify this option to the name of the model you want to loa
             --output_model_name model_CD_CT.bin  > train_CD_CT.log 2>&1
 ```
 
