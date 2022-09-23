@@ -618,9 +618,9 @@ def main():
                                                     cache_dir=args.cache_dir if args.cache_dir else None)
             model = Model(model, config, tokenizer, args)
             model.load_state_dict(adapted_state_dict, strict=False)
-            print(f"Successfully loaded custom model ({args.model_name})!")
+            logger.info(f"Successfully loaded custom model ({args.model_name})!")
         else:
-            print('Model loading error')
+            logger.info('Model loading error')
 
 
     if args.local_rank == 0:
