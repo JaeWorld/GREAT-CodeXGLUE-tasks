@@ -513,7 +513,7 @@ if __name__=="__main__":
 
         trained_model = train(args, train_data, train_dataloader, model, tokenizer)
 
-        evaluate(args, test_dataloader, trained_model, tokenizer)
+        # evaluate(args, test_dataloader, trained_model, tokenizer)
 
         #save last checkpoint
         last_output_dir = os.path.join(args.output_dir, 'checkpoint-last')
@@ -522,6 +522,7 @@ if __name__=="__main__":
         model_to_save = model.module if hasattr(model, 'module') else model  # Only save the model it-self
         output_model_file = os.path.join(last_output_dir, args.output_model_name[:-4]+f"_fold{fold}.bin")
         torch.save(model_to_save.state_dict(), output_model_file)
+        logger.info(f"Saved model file to {output_model_file}")
     
     
 
