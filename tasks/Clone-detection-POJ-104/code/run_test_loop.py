@@ -175,7 +175,7 @@ def test(args, model, tokenizer, model_name):
     result = os.popen(f'python ../evaluator/evaluator.py -a saved_models/answers.jsonl   -p saved_models/{preds_file_name}').read()
     result = ast.literal_eval(result)
     map_score = result['MAP@R']
-    logger.info(f"Accuracy: {map_score}")
+    logger.info(f"MAP score: {map_score}")
     return map_score
     
 
