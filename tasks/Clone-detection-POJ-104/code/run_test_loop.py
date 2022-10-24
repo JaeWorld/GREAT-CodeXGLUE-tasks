@@ -8,7 +8,7 @@ import pickle
 import random
 import re
 import shutil
-
+import ast
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, Dataset, SequentialSampler, RandomSampler,TensorDataset
@@ -162,7 +162,8 @@ def test(args, model, tokenizer, model_name):
     indexs=[]
     for example in eval_dataset.examples:
         indexs.append(example.index)
-    with open(os.path.join(args.output_dir,f"predictions_{model_name[:-4]}.jsonl"),'w') as f:
+    preds_file_name = f"predictions_{model_name[:-4]}.jsonl"
+    with open(os.path.join(args.output_dir, preds_file_name),'w') as f:
         for index,sort_id in zip(indexs,sort_ids):
             js={}
             js['index']=index
@@ -170,6 +171,13 @@ def test(args, model, tokenizer, model_name):
             for idx in sort_id[:499]:
                 js['answers'].append(indexs[int(idx)])
             f.write(json.dumps(js)+'\n')
+            
+    result = os.popen(f'python ../evaluator/evaluator.py -a saved_models/answers.jsonl   -p saved_models/{preds_file_name}').read()
+    result = ast.literal_eval(result)
+    map_score = result['MAP@R']
+    logger.info(f"Accuracy: {map_score}")
+    return map_score
+    
 
 # Get model name and load model
 def load_model(args, model_name):
@@ -342,6 +350,7 @@ if __name__=="__main__":
     args.start_epoch = 0
     args.start_step = 0
 
+    map_list = []
     # Run test for model files in model directory
     for model_name in os.listdir(args.model_dir):
         if os.path.isfile(os.path.join(args.model_dir, model_name)):
@@ -350,4 +359,8 @@ if __name__=="__main__":
             model.load_state_dict(torch.load(model_dir), strict=False)
             model.to(args.device)
             logger.info(f"Successfully loaded model: {model_name} from {model_dir}")
-            test(args, model, tokenizer, model_name)
+            map_score = test(args, model, tokenizer, model_name)
+            map_list.append(map_score)
+            
+    logger.info(f"MAP list = {map_list}")
+    logger.info(f"Average MAP = {sum(map_list) / len(map_list)}")
