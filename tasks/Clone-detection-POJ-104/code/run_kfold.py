@@ -180,7 +180,7 @@ def load_model():
                                                     do_lower_case=args.do_lower_case,
                                                     cache_dir=args.cache_dir if args.cache_dir else None)
             model = Model(model, config, tokenizer, args)
-            model.load_state_dict(adapted_state_dict)
+            model.load_state_dict(adapted_state_dict, strict=False)
             logger.info(f"Successfully loaded custom model ({args.model_name})!")
         else:
             logger.info('Model loading error')
