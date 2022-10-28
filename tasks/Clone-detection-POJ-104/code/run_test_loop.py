@@ -79,11 +79,11 @@ class TextDataset(Dataset):
             self.examples.append(convert_examples_to_features(js,tokenizer,args))
         if 'train' in file_path:
             for idx, example in enumerate(self.examples[:3]):
-                    logger.info("*** Example ***")
-                    logger.info("idx: {}".format(idx))
-                    logger.info("label: {}".format(example.label))
-                    logger.info("input_tokens: {}".format([x.replace('\u0120','_') for x in example.input_tokens]))
-                    logger.info("input_ids: {}".format(' '.join(map(str, example.input_ids))))
+                    logger.critical("*** Example ***")
+                    logger.critical("idx: {}".format(idx))
+                    logger.critical("label: {}".format(example.label))
+                    logger.critical("input_tokens: {}".format([x.replace('\u0120','_') for x in example.input_tokens]))
+                    logger.critical("input_ids: {}".format(' '.join(map(str, example.input_ids))))
         self.label_examples={}
         for e in self.examples:
             if e.label not in self.label_examples:
@@ -131,9 +131,9 @@ def test(args, model, tokenizer, model_name):
         model = torch.nn.DataParallel(model)
 
     # Eval!
-    logger.info("***** Running Test *****")
-    logger.info("  Num examples = %d", len(eval_dataset))
-    logger.info("  Batch size = %d", args.eval_batch_size)
+    logger.critical("***** Running Test *****")
+    logger.critical("  Num examples = %d", len(eval_dataset))
+    logger.critical("  Batch size = %d", args.eval_batch_size)
     eval_loss = 0.0
     nb_eval_steps = 0
     model.eval()
@@ -175,7 +175,7 @@ def test(args, model, tokenizer, model_name):
     result = os.popen(f'python ../evaluator/evaluator.py -a saved_models/answers.jsonl   -p saved_models/{preds_file_name}').read()
     result = ast.literal_eval(result)
     map_score = result['MAP@R']
-    logger.info(f"MAP score: {map_score}")
+    logger.critical(f"MAP score: {map_score}")
     return map_score
     
 
@@ -358,9 +358,9 @@ if __name__=="__main__":
             config, tokenizer, model = load_model(args, model_name)
             model.load_state_dict(torch.load(model_dir), strict=False)
             model.to(args.device)
-            logger.info(f"Successfully loaded model: {model_name} from {model_dir}")
+            logger.critical(f"Successfully loaded model: {model_name} from {model_dir}")
             map_score = test(args, model, tokenizer, model_name)
             map_list.append(map_score)
             
-    logger.info(f"MAP list = {map_list}")
-    logger.info(f"Average MAP = {sum(map_list) / len(map_list)}")
+    logger.critical(f"MAP list = {map_list}")
+    logger.critical(f"Average MAP = {sum(map_list) / len(map_list)}")
