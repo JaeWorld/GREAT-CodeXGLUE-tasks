@@ -215,7 +215,7 @@ def load_model(args):
         if model_latest_ft == 'DD':
             adapted_state_dict = {k.replace('encoder.roberta.', 'encoder.', 1): v for k, v in model_state_dict.items()}
         if model_latest_ft == 'CR':
-            adapted_state_dict = {k: v for k, v in model_state_dict.items() if 'decoder' not in k}
+            adapted_state_dict = {k: v for k, v in model_state_dict.items()}
             
         model.load_state_dict(adapted_state_dict, strict=False)
         
