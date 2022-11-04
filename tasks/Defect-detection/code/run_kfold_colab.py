@@ -30,6 +30,8 @@ import pickle
 import random
 import re
 import shutil
+from datetime import datetime
+
 
 import numpy as np
 import torch
@@ -547,7 +549,11 @@ def main():
         pickle.dump(total_loss, f)
     with open(f'total_acc_{args.output_model_name[:-4]}.pickle', 'wb') as f:
         pickle.dump(total_acc, f)
-        
+     
+    now = datetime.now()
+
+    current_time = now.strftime("%H:%M:%S")
+    logger.critical("Current Time =", current_time)
     #mean_loss = sum(total_loss) / len(total_loss)
     #mean_acc = sum(total_acc) / len(total_acc)
 
