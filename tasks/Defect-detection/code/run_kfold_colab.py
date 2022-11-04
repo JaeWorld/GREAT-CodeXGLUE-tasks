@@ -543,7 +543,8 @@ def main():
             output_dir = os.path.join(output_dir, '{}'.format(args.output_model_name[:-4]+f'_fold{fold}.bin')) 
             torch.save(model_to_save.state_dict(), output_dir)
             logger.critical("Saving model checkpoint to %s", output_dir)
-
+            current_time = now.strftime("%H:%M:%S")
+            logger.critical("Each fold time =", current_time)
 
     with open(f'total_loss_{args.output_model_name[:-4]}.pickle', 'wb') as f:
         pickle.dump(total_loss, f)
