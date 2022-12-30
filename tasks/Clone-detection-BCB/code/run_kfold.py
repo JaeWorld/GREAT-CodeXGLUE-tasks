@@ -287,12 +287,10 @@ def train(args, train_dataset, train_dataloader, model, tokenizer):
         tr_num=0
         train_loss=0
         for step, batch in enumerate(bar):
-            inputs = batch[0].to(args.device)    
-            p_inputs = batch[1].to(ar gs.device)
-            n_inputs = batch[2].to(args.device)
-            labels = batch[3].to(args.device)
+            inputs = batch[0].to(args.device)        
+            labels=batch[1].to(args.device) 
             model.train()
-            loss,vec = model(inputs,p_inputs,n_inputs,labels)
+            loss,vec = model(inputs,labels)
 
 
             if args.n_gpu > 1:
