@@ -18,6 +18,6 @@ python run_kfold.py \
 	--learning_rate 5e-5 \
 	--train_steps 100000 \
 	--eval_steps 5000 \
-        --load_model_path ../../../models/model_CD_CT.bin \
-        --output_model_name model_CD_CT_CR_kfold.bin  > train_CD_CT_CR_kfold.log 2>&1
+        --load_model_path ../../../models/model_CT_CD.bin \
+        --output_model_name model_CT_CD_CR_kfold.bin  > train_CT_CD_CR_kfold.log 2>&1
 ```
