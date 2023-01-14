@@ -43,6 +43,7 @@ python run_kfold.py \
 	--train_steps 30000 \
 	--eval_steps 5000 \
             --load_model_path ../../../models/model_DD_CS.bin \
+	    --load_decoder_path ../../../models/model_CR.bin \   # use this option if you need to manually add decoder parameters 
             --output_model_name model_DD_CS_CT_kfold.bin  > train_DD_CS_CT_kfold.log 2>&1
 ```
 
