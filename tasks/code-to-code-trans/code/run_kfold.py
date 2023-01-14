@@ -207,23 +207,24 @@ def load_model(args):
     if args.load_model_path is not None:
         logger.info("reload model from {}".format(args.load_model_path))
         model_state_dict = torch.load(args.load_model_path)
-        adapted_state_dict = model_state_dict
-        
-        # modifying state_dict dict
+        model_latest_ft = args.load_model_path[-6:-4]
+
         if model_latest_ft == 'CD':
             adapted_state_dict = model_state_dict
-        if model_latest_ft == 'DD':
-            adapted_state_dict = {k.replace('encoder.roberta.', 'encoder.', 1): v for k, v in model_state_dict.items()}
         if model_latest_ft == 'CR':
             adapted_state_dict = {k: v for k, v in model_state_dict.items()}
+        if model_latest_ft == 'DD':
+            adapted_state_dict = {k.replace('encoder.roberta.', 'encoder.', 1): v for k, v in model_state_dict.items()}
+
+        if args.load_decoder_path:
+            decoder_state_dict = torch.load(args.load_decoder_path)
+            decoder_adapted_state_dict = {k: v for k, v in decoder_state_dict.items() if 'decoder' in k}
+            adapted_state_dict.update(decoder_adapted_state_dict)
             
+
         model.load_state_dict(adapted_state_dict, strict=False)
-        
-        model_latest_ft = args.load_model_path[-6:-4]
-        adapted_state_dict = model_state_dict
-            
-        
         logger.info("Successfully loaded custom model!")
+        # logger.info(adapted_state_dict.keys())
 
     return config, model, tokenizer
 
@@ -368,6 +369,8 @@ if __name__=="__main__":
                         help="The output directory where the model predictions and checkpoints will be written.")
     parser.add_argument("--load_model_path", default=None, type=str, 
                         help="Path to trained model: Should contain the .bin files" )    
+    parser.add_argument("--load_decoder_path", default=None, type=str,
+                        help="Path to trained model for decoder")
     ## Other parameters
     parser.add_argument("--train_filename", default=None, type=str,
                         help="The train filenames (source and target files).")
@@ -515,15 +518,14 @@ if __name__=="__main__":
 
         # evaluate(args, test_dataloader, trained_model, tokenizer)
 
-        #save last checkpoint
+        # save last checkpoint
         last_output_dir = os.path.join(args.output_dir, 'checkpoint-last')
         if not os.path.exists(last_output_dir):
             os.makedirs(last_output_dir)
         model_to_save = model.module if hasattr(model, 'module') else model  # Only save the model it-self
         output_model_file = os.path.join(last_output_dir, args.output_model_name[:-4]+f"_fold{fold}.bin")
         torch.save(model_to_save.state_dict(), output_model_file)
-        logger.info(f"Saved model file to {output_model_file}")
-    
+        logger.info(f"Successfully saved model: {args.output_model_name}")    
     
 
     
