@@ -193,6 +193,7 @@ def load_model(args):
         logger.info("reload model from {}".format(args.load_model_path))
         model_state_dict = torch.load(args.load_model_path)
         model_latest_ft = args.load_model_path[-6:-4]
+        ct_model = torch.load("../../../models/model_CT.bin")
 
         if model_latest_ft == 'CD':
             adapted_state_dict = model_state_dict
@@ -200,7 +201,8 @@ def load_model(args):
             adapted_state_dict = {k: v for k, v in model_state_dict.items()}
         if model_latest_ft == 'DD':
             adapted_state_dict = {k.replace('encoder.roberta.', 'encoder.', 1): v for k, v in model_state_dict.items()}
-
+        if 'CT' in args.load_model_path and 'CT' != model_latest_ft:
+            adapted_state_dict.update({k: v for k, v in ct_model.items() if 'decoder' in k})
         model.load_state_dict(adapted_state_dict, strict=False)
         logger.info("Successfully loaded custom model!")
 
