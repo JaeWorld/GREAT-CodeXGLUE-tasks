@@ -16,7 +16,7 @@ python run_kfold.py \
 	--train_batch_size 16 \
 	--eval_batch_size 16 \
 	--learning_rate 5e-5 \
-	--train_steps 100000 \
+	--train_steps 30000 \
 	--eval_steps 5000 \
         --load_model_path ../../../models/model_CT_CD.bin \
         --output_model_name model_CT_CD_CR_kfold.bin  > train_CT_CD_CR_kfold.log 2>&1
