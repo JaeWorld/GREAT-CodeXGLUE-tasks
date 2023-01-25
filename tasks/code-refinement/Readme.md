@@ -13,8 +13,8 @@ python run_kfold.py \
 	--max_source_length 256 \
 	--max_target_length 256 \
 	--beam_size 5 \
-	--train_batch_size 16 \
-	--eval_batch_size 16 \
+	--train_batch_size 8 \
+	--eval_batch_size 8 \
 	--learning_rate 5e-5 \
 	--train_steps 30000 \
 	--eval_steps 5000 \
