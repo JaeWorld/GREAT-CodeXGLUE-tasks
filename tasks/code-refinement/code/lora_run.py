@@ -38,7 +38,9 @@ from bleu import _bleu
 from torch.utils.data import DataLoader, Dataset, SequentialSampler, RandomSampler,TensorDataset
 from torch.utils.data.distributed import DistributedSampler
 from transformers import (WEIGHTS_NAME, AdamW, get_linear_schedule_with_warmup,
-                          RobertaConfig, RobertaModel, RobertaTokenizer)
+                          RobertaConfig, RobertaModel, RobertaTokenizer,
+                          AutoTokenizer, AutoModel, AutoConfig)
+from peft import LoraConfig, LoraModel
 MODEL_CLASSES = {'roberta': (RobertaConfig, RobertaModel, RobertaTokenizer)}
 
 logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
@@ -268,20 +270,35 @@ def main():
     if os.path.exists(args.output_dir) is False:
         os.makedirs(args.output_dir)
     
-    # config_class, model_class, tokenizer_class = MODEL_CLASSES[args.model_type]
-    # config = config_class.from_pretrained(args.config_name if args.config_name else args.model_name_or_path)
-    # tokenizer = tokenizer_class.from_pretrained(args.tokenizer_name,do_lower_case=args.do_lower_case)
+    #Hyunjae's CodeBert
+    config_class, model_class, tokenizer_class = MODEL_CLASSES[args.model_type]
+    config = config_class.from_pretrained(args.config_name if args.config_name else args.model_name_or_path)
+    tokenizer = tokenizer_class.from_pretrained(args.tokenizer_name,do_lower_case=args.do_lower_case)
 
-    # #build model
-    # encoder = model_class.from_pretrained(args.model_name_or_path,config=config)    
-    # decoder_layer = nn.TransformerDecoderLayer(d_model=config.hidden_size, nhead=config.num_attention_heads)
-    # decoder = nn.TransformerDecoder(decoder_layer, num_layers=6)
-    # model=Seq2Seq(encoder=encoder,decoder=decoder,config=config,
-    #               beam_size=args.beam_size,max_length=args.max_target_length,
-    #               sos_id=tokenizer.cls_token_id,eos_id=tokenizer.sep_token_id)
+    # build model
+    encoder = model_class.from_pretrained(args.model_name_or_path, config=config)    
+    decoder_layer = nn.TransformerDecoderLayer(d_model=config.hidden_size, nhead=config.num_attention_heads)
+    decoder = nn.TransformerDecoder(decoder_layer, num_layers=6)
+    bert = Seq2Seq(encoder=encoder,decoder=decoder,config=config,
+                  beam_size=args.beam_size,max_length=args.max_target_length,
+                  sos_id=tokenizer.cls_token_id,eos_id=tokenizer.sep_token_id)
+
     
-    #LoRA Config and build model
-    
+    #Load model from huggingface
+    # config = AutoConfig.from_pretrained(args.config_name if args.config_name else args.model_name_or_path)
+    # tokenizer = AutoTokenizer.from_pretrained(args.config_name if args.config_name else args.model_name_or_path)
+    # bert = AutoModel.from_config(config)
+
+    #LoRA Config and Build model
+    lora_config = LoraConfig(
+        task_type = "SEQ_2_SEQ_LM",
+        r = 16,
+        lora_alpha = 32,
+        lora_dropout = 0.05,
+        target_modules= ["query", "value"]
+    )
+
+    model = LoraModel(bert, lora_config, "default")
 
     if args.load_model_path is not None:
         logger.info("reload model from {}".format(args.load_model_path))
@@ -418,7 +435,7 @@ def main():
                                            target_ids=target_ids,target_mask=target_mask)     
                     eval_loss += loss.sum().item()
                     tokens_num += num.sum().item()
-                #Pring loss of dev dataset    
+                #Print loss of dev dataset    
                 model.train()
                 eval_loss = eval_loss / tokens_num
                 result = {'eval_ppl': round(np.exp(eval_loss),5),
