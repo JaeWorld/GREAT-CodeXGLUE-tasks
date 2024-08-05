@@ -292,10 +292,9 @@ def main():
     #LoRA Config and Build model
     lora_config = LoraConfig(
         task_type = "SEQ_2_SEQ_LM",
-        r = 16,
-        lora_alpha = 32,
-        lora_dropout = 0.05,
-        target_modules= ["query", "value"]
+        r = 3000,
+        lora_alpha = 8385,
+        lora_dropout = 0.05
     )
 
     model = LoraModel(bert, lora_config, "default")
